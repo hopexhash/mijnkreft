@@ -55,12 +55,16 @@ export class UIManager {
     });
     document.addEventListener('pointerlockerror', () => {
       this.lockFallback = true;
+      // no hidden system cursor in fallback mode — make it read as a reticle
+      this.canvas.style.cursor = 'crosshair';
     });
 
     document.addEventListener('mousedown', (e) => {
       if (!this.game || this.anyModalOpen() || this.pauseOpen || this.deathOpen) return;
-      if (document.pointerLockElement !== this.canvas && !this.lockFallback) return;
-      if (e.target !== this.canvas && e.target !== document.body && !this.hud.contains(e.target) && document.pointerLockElement !== this.canvas) return;
+      const locked = document.pointerLockElement === this.canvas;
+      if (!locked && !this.lockFallback) return;
+      // in fallback mode only react to clicks that reach the game view
+      if (!locked && e.target !== this.canvas && e.target !== document.body) return;
       if (e.button === 0) input.leftDown = true;
       if (e.button === 2) {
         input.rightDown = true;
