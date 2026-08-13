@@ -499,6 +499,10 @@ export class EntityManager {
     for (let i = this.creatures.length - 1; i >= 0; i--) {
       const c = this.creatures[i];
       c.update(dt, playerPos, game);
+      // occasional ambient call when near the player
+      if (!c.dead && Math.random() < dt * 0.03 && c.pos.distanceTo(playerPos) < 14) {
+        game.audio?.play('creature', { minGap: 1200 });
+      }
       if (c.dead) {
         if (c.dying <= 0 && c.health <= 0) {
           // drop loot

@@ -15,6 +15,7 @@ import { Inventory } from '../inventory/Inventory.js';
 import { CraftingSystem } from '../crafting/CraftingSystem.js';
 import { EntityManager } from '../entities/EntityManager.js';
 import { Sky } from '../sky/Sky.js';
+import { HandView } from '../player/HandView.js';
 import { getItem } from '../world/ItemRegistry.js';
 import { SMELT_TIME } from '../crafting/recipes.js';
 
@@ -48,6 +49,7 @@ export class Game {
     this.crafting = new CraftingSystem();
     this.entities = new EntityManager(this.world, this.scene);
     this.interaction = new Interaction(this);
+    this.handView = new HandView(this);
 
     this.paused = false;
     this.elapsed = 0;
@@ -263,9 +265,10 @@ export class Game {
       gameMode: this.mode
     });
 
-    // entities, furnaces
+    // entities, furnaces, held item view
     this.entities.update(dt, this);
     this.updateFurnaces(dt);
+    this.handView.update(dt);
 
     // sky + fog + materials
     const biome = this.world.generator.biomeAt(Math.floor(this.player.position.x), Math.floor(this.player.position.z));
@@ -278,7 +281,7 @@ export class Game {
     const fogFar = underwater ? 18 : rd - 2;
     const fogColor = underwater ? { r: 0.08, g: 0.2, b: 0.4 } : this.sky.fogColor;
     updateChunkMaterials({
-      sun: Math.max(0.06, this.sky.sunFactor),
+      sun: Math.max(0.16, this.sky.sunFactor), // 0.16 floor = moonlight
       fogColor, fogNear, fogFar,
       time: this.elapsed
     });
