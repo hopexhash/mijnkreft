@@ -25,6 +25,9 @@ export class UIManager {
     this.inventoryUI = new InventoryUI(this);
     this.pauseOpen = false;
     this.deathOpen = false;
+    // When pointer lock is unavailable (e.g. sandboxed iframes), fall back
+    // to free mouse-look: raw mousemove deltas steer the camera.
+    this.lockFallback = false;
     this.debugOpen = false;
     this.heldLabelTimer = 0;
     this.fps = 0;
@@ -45,15 +48,19 @@ export class UIManager {
     const input = this.input;
 
     document.addEventListener('mousemove', (e) => {
-      if (document.pointerLockElement === this.canvas) {
+      if (document.pointerLockElement === this.canvas || this.fallbackLookActive()) {
         input.mouseDX += e.movementX;
         input.mouseDY += e.movementY;
       }
     });
+    document.addEventListener('pointerlockerror', () => {
+      this.lockFallback = true;
+    });
 
     document.addEventListener('mousedown', (e) => {
       if (!this.game || this.anyModalOpen() || this.pauseOpen || this.deathOpen) return;
-      if (document.pointerLockElement !== this.canvas) return;
+      if (document.pointerLockElement !== this.canvas && !this.lockFallback) return;
+      if (e.target !== this.canvas && e.target !== document.body && !this.hud.contains(e.target) && document.pointerLockElement !== this.canvas) return;
       if (e.button === 0) input.leftDown = true;
       if (e.button === 2) {
         input.rightDown = true;
@@ -83,7 +90,7 @@ export class UIManager {
     });
 
     document.addEventListener('pointerlockchange', () => {
-      if (document.pointerLockElement !== this.canvas && this.game &&
+      if (document.pointerLockElement !== this.canvas && this.game && !this.lockFallback &&
           !this.anyModalOpen() && !this.deathOpen && !this.pauseOpen) {
         this.openPause();
       }
@@ -124,11 +131,18 @@ export class UIManager {
           this.closeModal();
         } else if (this.pauseOpen) {
           this.closePause();
+        } else if (this.lockFallback && !this.deathOpen) {
+          // no pointer lock to release, so Esc pauses directly
+          this.openPause();
         }
-        // pointer-lock Esc automatically triggers pause via pointerlockchange
+        // with pointer lock, Esc triggers pause via pointerlockchange
       }
       if (e.code === 'F3') e.preventDefault();
     });
+  }
+
+  fallbackLookActive() {
+    return this.lockFallback && this.game && !this.anyModalOpen() && !this.pauseOpen && !this.deathOpen;
   }
 
   lockPointer() {
