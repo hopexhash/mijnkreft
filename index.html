@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KREFT — Voxel Survival Saga</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%233f9a74'/><rect y='10' width='16' height='6' fill='%238a6b47'/></svg>" />
+  <link rel="stylesheet" href="./src/ui/styles.css" />
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+
+  <!-- In-game HUD -->
+  <div id="hud" class="hidden">
+    <div id="crosshair">+</div>
+    <div id="water-overlay"></div>
+    <div id="damage-flash"></div>
+    <div id="hud-bottom">
+      <div id="stats-row">
+        <div id="health-bar" class="stat-bar"></div>
+        <div id="air-bar" class="stat-bar"></div>
+        <div id="hunger-bar" class="stat-bar"></div>
+      </div>
+      <div id="hotbar"></div>
+    </div>
+    <div id="hud-topright">
+      <div id="clock"></div>
+      <div id="debug-info"></div>
+    </div>
+    <div id="held-label"></div>
+  </div>
+
+  <!-- Modal layer: inventory / bench / furnace / chest / creative -->
+  <div id="modal-root" class="hidden"></div>
+
+  <!-- Menus -->
+  <div id="menu-root"></div>
+
+  <div id="tooltip" class="hidden"></div>
+  <div id="cursor-stack" class="hidden"></div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
