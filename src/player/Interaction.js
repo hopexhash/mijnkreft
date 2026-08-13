@@ -166,10 +166,17 @@ export class Interaction {
       if (def.id === B.LEAVES) {
         if (Math.random() < 0.12) game.entities.spawnDrop('stick', 1, x + 0.5, y + 0.4, z + 0.5);
         if (Math.random() < 0.05) game.entities.spawnDrop('berries', 1, x + 0.5, y + 0.4, z + 0.5);
+      } else if (def.id === B.TALL_GRASS) {
+        // wild grass yields grain for flatbread
+        if (Math.random() < 0.35) game.entities.spawnDrop('grain', 1, x + 0.5, y + 0.4, z + 0.5);
       } else if (def.drop !== false && toolOk) {
         const dropName = def.drop || def.name;
         if (getItem(dropName)) {
           game.entities.spawnDrop(dropName, def.dropCount || 1, x + 0.5, y + 0.4, z + 0.5, false);
+        }
+        // desert cacti sometimes carry fruit
+        if (def.id === B.CACTUS && Math.random() < 0.3) {
+          game.entities.spawnDrop('cactus_fruit', 1, x + 0.5, y + 0.4, z + 0.5);
         }
       }
       // tool durability
